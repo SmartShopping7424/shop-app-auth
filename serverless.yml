@@ -1,0 +1,90 @@
+############################
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+# docs.serverless.com
+#
+# Happy Coding !!
+############################
+
+# name of the service
+service: shop-auth
+
+# serverless framework version
+frameworkVersion: "2 || 3"
+
+# excluded package
+package:
+  exclude:
+    - node_modules/**
+    - package.json
+    - package-lock.json
+    - .npmignore
+    - .gitignore
+
+# main provider and aws credentials
+provider:
+  name: aws
+  profile: easyshop
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  stage: ${opt:stage,'dev'}
+  region: ap-south-1
+  role: arn:aws:iam::640552593021:role/LambdaFunctionExecutionRole
+  deploymentBucket: easyshop-deployment
+  vpc:
+    securityGroupIds:
+      - sg-01477f1e33713927d
+    subnetIds:
+      - subnet-06b448a89a0f87c67
+      - subnet-02e7e4690606ada64
+      - subnet-0f0d872456d7b1011
+  environment:
+    ACCOUNT_ID: 640552593021
+    REGION: ${self:provider.region}
+    STAGE: ${self:provider.stage}
+    DATABASE_HOST: easyshop-database.cluster-cxiypz5kmfwc.ap-south-1.rds.amazonaws.com
+    DATABASE_NAME: easyshop_${self:provider.stage}
+    DATABASE_USER: easyshop_admin
+    DATABASE_PASSWORD: easyshopadmin123
+    DATABASE_PORT: 3306
+
+# lambda functions
+functions:
+  presignup:
+    handler: src/presignup.handler
+    environment:
+      NODE_PATH: "./:/opt/node_modules"
+    layers:
+      - arn:aws:lambda:ap-south-1:640552593021:layer:package:latest
+
+  define:
+    handler: src/define.handler
+    environment:
+      NODE_PATH: "./:/opt/node_modules"
+    layers:
+      - arn:aws:lambda:ap-south-1:640552593021:layer:package:latest
+
+  create:
+    handler: src/create.handler
+    environment:
+      NODE_PATH: "./:/opt/node_modules"
+    layers:
+      - arn:aws:lambda:ap-south-1:640552593021:layer:package:latest
+
+  verify:
+    handler: src/verify.handler
+    environment:
+      NODE_PATH: "./:/opt/node_modules"
+    layers:
+      - arn:aws:lambda:ap-south-1:640552593021:layer:package:latest
+
+# plugins
+plugins:
+  - serverless-latest-layer-version
